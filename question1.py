@@ -64,3 +64,70 @@ def decrypt_char(char, shift1, shift2):
 
 
 # Function to process the whole text
+# Applies encryption or decryption character by character
+def transform_text(text, shift1, shift2, encrypt=True):
+    result = ""
+
+    # iterate through each character in the text
+    for char in text:
+        if encrypt:
+            result += encrypt_char(char, shift1, shift2)
+        else:
+            result += decrypt_char(char, shift1, shift2)
+
+    return result
+
+
+# Function to encrypt the file
+# Reads raw_text.txt and writes encrypted result to encrypted_text.txt
+def encrypt_file(shift1, shift2):
+    with open("raw_text.txt", "r", encoding="utf-8") as file:
+        original_text = file.read()
+
+    encrypted_text = transform_text(original_text, shift1, shift2, encrypt=True)
+
+    with open("encrypted_text.txt", "w", encoding="utf-8") as file:
+        file.write(encrypted_text)
+
+
+# Function to decrypt the file
+# Reads encrypted_text.txt and writes decrypted result to decrypted_text.txt
+def decrypt_file(shift1, shift2):
+    with open("encrypted_text.txt", "r", encoding="utf-8") as file:
+        encrypted_text = file.read()
+
+    decrypted_text = transform_text(encrypted_text, shift1, shift2, encrypt=False)
+
+    with open("decrypted_text.txt", "w", encoding="utf-8") as file:
+        file.write(decrypted_text)
+
+
+# Function to verify the result
+# Compares original and decrypted text to ensure correctness
+def verify_decryption():
+    with open("raw_text.txt", "r", encoding="utf-8") as file:
+        original_text = file.read()
+
+    with open("decrypted_text.txt", "r", encoding="utf-8") as file:
+        decrypted_text = file.read()
+
+    if original_text == decrypted_text:
+        print("Verification successful: decrypted text matches original text.")
+    else:
+        print("Verification failed: decrypted text does not match original text.")
+
+
+# Main function
+# Takes user input for shift values and runs the full process
+def main():
+    shift1 = int(input("Enter shift1: "))
+    shift2 = int(input("Enter shift2: "))
+
+    encrypt_file(shift1, shift2)
+    decrypt_file(shift1, shift2)
+    verify_decryption()
+
+
+# Program entry point
+if __name__ == "__main__":
+    main()
