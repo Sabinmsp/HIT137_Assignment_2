@@ -109,3 +109,116 @@ class Parser:
             return Node("neg", self.parse_unary())
 
         return self.parse_primary()
+
+
+    # primary → NUM | (expression)
+    def parse_primary(self):
+        token = self.current()
+
+        if token.type == "NUM":
+            self.eat("NUM")
+            return Node(token.value)
+
+        if token.type == "LPAREN":
+            self.eat("LPAREN")
+            node = self.parse_expression()
+
+            if self.current().type != "RPAREN":
+                raise ValueError("Missing )")
+
+            self.eat("RPAREN")
+            return node
+
+        raise ValueError("Invalid expression")
+
+    def parse(self):
+        node = self.parse_expression()
+
+        if self.current().type != "END":
+            raise ValueError("Extra tokens")
+
+        return node
+
+
+# ---------------- TREE TO STRING ----------------
+def tree_to_string(node):
+    if node.left is None and node.right is None:
+        return str(node.value)
+
+    if node.value == "neg":
+        return f"(neg {tree_to_string(node.left)})"
+
+    return f"({node.value} {tree_to_string(node.left)} {tree_to_string(node.right)})"
+
+
+# ---------------- EVALUATOR ----------------
+def evaluate(node):
+    if node.left is None and node.right is None:
+        return int(node.value)
+
+    if node.value == "neg":
+        return -evaluate(node.left)
+
+    left = evaluate(node.left)
+    right = evaluate(node.right)
+
+    if node.value == "+":
+        return left + right
+    if node.value == "-":
+        return left - right
+    if node.value == "*":
+        return left * right
+    if node.value == "/":
+        if right == 0:
+            raise ZeroDivisionError()
+        return left // right
+
+    raise ValueError("Unknown operator")
+
+
+# ---------------- PROCESS ----------------
+def process(expr):
+    expr = expr.strip()
+
+    try:
+        tokens = tokenize(expr)
+        parser = Parser(tokens)
+        tree = parser.parse()
+        result = evaluate(tree)
+
+        token_str = " ".join(str(t) for t in tokens)
+
+        return [
+            f"Input: {expr}",
+            f"Tree: {tree_to_string(tree)}",
+            f"Tokens: {token_str}",
+            f"Result: {result}"
+        ]
+
+    except:
+        return [
+            f"Input: {expr}",
+            "Tree: ERROR",
+            "Tokens: ERROR",
+            "Result: ERROR"
+        ]
+
+
+# ---------------- MAIN ----------------
+def main():
+    with open("sample_input.txt") as f:
+        lines = f.readlines()
+
+    output = []
+
+    for line in lines:
+        if line.strip():
+            output.extend(process(line))
+            output.append("")
+
+    with open("sample_output.txt", "w") as f:
+        f.write("\n".join(output).rstrip())
+
+
+if __name__ == "__main__":
+    main()
