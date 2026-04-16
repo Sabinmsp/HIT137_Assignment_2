@@ -32,8 +32,3 @@ Input: 1 / 0
 Tree: ERROR
 Tokens: ERROR
 Result: ERROR
-
-Input: -(38 + 42)
-Tree: (neg (+ 38 42))
-Tokens: [OP:-] [LPAREN:(] [NUM:38] [OP:+] [NUM:42] [RPAREN:)] [END:]
-Result: -80
